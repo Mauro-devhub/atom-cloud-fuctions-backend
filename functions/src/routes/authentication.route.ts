@@ -2,6 +2,7 @@ import { Router } from "express";
 import { default as db } from "../database";
 import { ROUTE_MODULES } from "../route-modules";
 import { COLLECTIONS } from "../collections";
+import { JwtService } from "../service/jwt.service";
 
 const router = Router();
 
@@ -11,35 +12,38 @@ router.post(`${api}/login`, async (req, res) => {
   try {
     const { email } = req.body;
 
-    const user = await db.collection(COLLECTIONS.USERS).where("email", "==", email).get();
+    const snapshot = await db.collection(COLLECTIONS.USERS).where("email", "==", email).get();
 
-    console.log("user", user);
-
-    if (user) {
+    if (snapshot.empty) {
       res.status(404).json({message: "User not found"});
+      return;
     }
 
-    res.status(200).json(user);
+    const userDoc = snapshot.docs[0];
+    const token = JwtService.generateToken({uid: userDoc.id, email});
+
+    res.status(200).json({token});
   } catch (error) {
     res.status(500).json({message: "Ha ocurrido un error: " + error})
   }
 })
 
-router.get(`${api}/register`, async (req, res) => {
+router.post(`${api}/register`, async (req, res) => {
   try {
     const { email } = req.body;
 
-    const user = await db.collection(COLLECTIONS.USERS).where("email", "==", email).get();
+    const snapshot = await db.collection(COLLECTIONS.USERS).where("email", "==", email).get();
 
-    if (user) {
-      res.status(400).json("User already exists");
-    } else {
-      const item = await db.collection(COLLECTIONS.USERS).doc().create({
-        email
-      });
-
-      res.status(201).json(item);
+    if (!snapshot.empty) {
+      res.status(400).json({message: "User already exists"});
+      return;
     }
+
+    const docRef = db.collection(COLLECTIONS.USERS).doc();
+    await docRef.create({ email });
+
+    const token = JwtService.generateToken({uid: docRef.id, email});
+    res.status(201).json({token});
   } catch (error) {
     res.status(500).json({message: "Ha ocurrido un error: " + error})
   }

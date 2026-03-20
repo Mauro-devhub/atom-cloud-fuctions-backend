@@ -2,16 +2,20 @@ import { Router } from "express";
 import { default as db } from "../database";
 import { ROUTE_MODULES } from "../route-modules";
 import { COLLECTIONS } from "../collections";
-
-const router = Router();
+import { authMiddleware } from "../middleware/auth.middleware";
 
 const api = ROUTE_MODULES.prefix + ROUTE_MODULES.modules.tasks;
 
+const router = Router();
+
+router.use(ROUTE_MODULES.prefix + ROUTE_MODULES.modules.tasks, authMiddleware);
+
 router.post(api, async (req, res) => {
   try {
-    const { title, description, dateExpire, stateTask } = req.body;
+    const { email, title, description, dateExpire, stateTask } = req.body;
 
     const item = await db.collection(COLLECTIONS.TASKS).doc().create({
+      email,
       title,
       description,
       dateExpire,
