@@ -4,6 +4,12 @@ import { validate } from "class-validator";
 
 export function validationMiddleware(dtoClass: new () => object) {
   return async (req: Request, res: Response, next: NextFunction) => {
+
+    if (!req.body) {
+      res.status(400).json({ message: "Body is required" });
+      return;
+    }
+
     const dtoInstance = plainToInstance(dtoClass, req.body);
     const errors = await validate(dtoInstance, { whitelist: true, forbidNonWhitelisted: true });
 

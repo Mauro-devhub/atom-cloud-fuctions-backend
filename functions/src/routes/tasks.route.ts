@@ -75,7 +75,7 @@ router.patch(`${api}/:id`, validationMiddleware(UpdateTaskDto), async (req, res)
     if (dateExpire !== undefined) updateData.dateExpire = dateExpire;
     if (stateTask !== undefined) updateData.stateTask = stateTask;
 
-    const docRef = db.collection(COLLECTIONS.TASKS).doc(id);
+    const docRef = db.collection(COLLECTIONS.TASKS).doc(`${id}`);
     await docRef.update(updateData);
 
     const updatedDoc = await docRef.get();
