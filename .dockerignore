@@ -1,7 +1,6 @@
 node_modules
 functions/node_modules
 functions/lib
-functions/db.credential.json
 .git
 .github
 *.md
