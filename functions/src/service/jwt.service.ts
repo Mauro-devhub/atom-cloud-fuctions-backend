@@ -1,6 +1,6 @@
 import jwt, {JwtPayload, SignOptions} from "jsonwebtoken";
 
-const SECRET_KEY = process.env.JWT_SECRET || "elmejordemarte";
+const SECRET_KEY = process.env.JWT_SECRET || "desarrollo";
 const DEFAULT_EXPIRATION = "1h";
 
 export class JwtService {
