@@ -15,8 +15,8 @@ app.use(authenticationApi.default);
 // Firebase Functions entry point
 exports.app = onRequest(app);
 
-// Cloud Run / Docker entry point
-if (process.env.K_SERVICE || process.env.PORT) {
+// Cloud Run / Docker entry point (skip when running in Firebase emulator)
+if ((process.env.K_SERVICE || process.env.PORT) && !process.env.FUNCTIONS_EMULATOR) {
   const port = process.env.PORT || 8080;
   app.listen(port, () => {
     console.log(`Server listening on port ${port}`);

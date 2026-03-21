@@ -32,7 +32,7 @@ router.post(api, validationMiddleware(CreateTaskDto), async (req, res) => {
 
 router.get(api, async (req, res) => {
   try {
-    const query = db.collection(COLLECTIONS.TASKS);
+    const query = db.collection(COLLECTIONS.TASKS).where("email", "==", (req as any).user.email);
     const items = await query.get();
 
     const response: Task[] = items.docs.map(doc => ({
